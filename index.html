@@ -6,6 +6,7 @@
   <title>Khảo Sát Tác Động Của AI Đến Tư Duy Học Tập</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Inter', sans-serif; }
@@ -37,7 +38,7 @@
 
   <!-- Header -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-    <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
           AI
@@ -53,51 +54,19 @@
         <button id="tab-survey" onclick="switchTab('survey')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-white text-blue-600 shadow-sm">
           Phiếu Khảo Sát
         </button>
-        <button id="tab-dashboard" onclick="switchTab('dashboard')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900 flex items-center gap-1.5">
-          <span>Thống Kê</span>
-          <span id="badge-count" class="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+        <button id="tab-public" onclick="switchTab('public')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900 flex items-center gap-2">
+          <span>Kết Quả & Thông Số</span>
+          <span id="badge-count" class="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full font-bold">0</span>
         </button>
       </div>
     </div>
   </header>
 
   <!-- Main Content -->
-  <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-6 sm:py-8 space-y-6">
-
-    <!-- MockAPI Endpoint Config Bar -->
-    <section class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <div class="flex items-start gap-3">
-          <span id="api-status-dot" class="mt-1.5 w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
-          <div>
-            <div class="flex items-center gap-2 flex-wrap">
-              <h2 class="text-sm font-bold text-slate-800">MockAPI.io Endpoint</h2>
-              <span id="api-mode-badge" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                Đã cấu hình MockAPI.io
-              </span>
-            </div>
-            <p class="text-xs text-slate-500 mt-0.5">
-              Đang dùng project <code class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">6ad6540af71f154ac486c711</code>. Nếu resource của bạn tên khác <code class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">responses</code>, hãy sửa phần cuối và bấm <strong>Lưu URL</strong>.
-            </p>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-2 w-full md:w-auto">
-          <input
-            id="mockapi-url-input"
-            type="url"
-            placeholder="https://6ad6540af71f154ac486c711.mockapi.io/responses"
-            class="w-full md:w-80 text-xs sm:text-sm px-3 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button onclick="saveApiEndpoint()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-semibold rounded-xl transition shrink-0">
-            Lưu URL
-          </button>
-        </div>
-      </div>
-    </section>
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6 sm:py-8 space-y-6">
 
     <!-- TAB 1: SURVEY FORM -->
-    <div id="view-survey" class="space-y-6 animate-fade-in">
+    <div id="view-survey" class="max-w-4xl mx-auto space-y-6 animate-fade-in">
       <!-- Progress Bar -->
       <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm sticky top-[73px] z-20">
         <div class="flex justify-between items-center text-xs font-semibold text-slate-600 mb-2">
@@ -296,122 +265,135 @@
         </div>
 
         <!-- Submit Actions -->
-        <div class="flex flex-col sm:flex-row items-center justify-end gap-3 pt-2">
-          <button type="button" onclick="resetForm()" class="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-sm transition">
-            Làm mới lựa chọn
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+          <button type="button" onclick="switchTab('public')" class="w-full sm:w-auto px-5 py-3 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold text-sm transition">
+            Xem kết quả & thông số →
           </button>
-          <button id="submit-btn" type="submit" class="w-full sm:w-auto px-7 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-md shadow-blue-600/20 transition flex items-center justify-center gap-2">
-            <span>Gửi Kết Quả Khảo Sát</span>
-          </button>
+          <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+            <button type="button" onclick="resetForm()" class="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-sm transition">
+              Làm mới lựa chọn
+            </button>
+            <button id="submit-btn" type="submit" class="w-full sm:w-auto px-7 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow-md shadow-blue-600/20 transition flex items-center justify-center gap-2">
+              <span>Gửi Kết Quả Khảo Sát</span>
+            </button>
+          </div>
         </div>
       </form>
     </div>
 
-    <!-- TAB 2: DASHBOARD -->
-    <div id="view-dashboard" class="hidden space-y-6 animate-fade-in">
-      <!-- Top Controls & Summary -->
-      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <!-- TAB 2: KẾT QUẢ & THÔNG SỐ -->
+    <div id="view-public" class="hidden space-y-6 animate-fade-in">
+      <!-- Tiêu đề & Nút thao tác -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              TỰ ĐỘNG CẬP NHẬT
+            </span>
+            <span id="last-updated-text" class="text-xs text-slate-500">Đang cập nhật...</span>
+          </div>
+          <h2 class="text-xl font-extrabold text-slate-900">Kết Quả Khảo Sát & Các Thông Số Nổi Bật</h2>
+          <p class="text-xs sm:text-sm text-slate-500">
+            Biểu đồ quạt hiển thị <strong>số lượng câu trả lời</strong> và tỷ lệ <strong>%</strong> theo từng câu hỏi, tự động cập nhật khi có lượt gửi mới.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 shrink-0">
+          <button id="live-sync-btn" onclick="toggleAutoSync()" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold rounded-xl transition">
+            ● Tự động cập nhật: BẬT
+          </button>
+          <button onclick="refreshPublicResults(true)" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition">
+            ↻ Làm mới
+          </button>
+          <button onclick="exportCSV()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl transition">
+            Tải bảng CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Khối Thông Số Tổng Hợp (6 Chỉ Số Chính) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tổng số người tham gia</p>
+          <div class="flex items-baseline justify-between mt-2">
+            <span id="stat-total" class="text-3xl font-extrabold text-slate-900">0</span>
+            <span class="text-xs font-semibold text-slate-500">phiếu khảo sát</span>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Biết & có dùng AI (Thường xuyên / Thỉnh thoảng)</p>
+          <div class="flex items-baseline justify-between mt-2">
+            <span id="stat-using-pct" class="text-3xl font-extrabold text-blue-600">0%</span>
+            <span id="stat-using-count" class="text-xs font-semibold text-slate-600">0 phiếu</span>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Dùng AI trên 30 phút/ngày</p>
+          <div class="flex items-baseline justify-between mt-2">
+            <span id="stat-over30-pct" class="text-3xl font-extrabold text-indigo-600">0%</span>
+            <span id="stat-over30-count" class="text-xs font-semibold text-slate-600">0 phiếu</span>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Bật ngay AI khi gặp bài khó</p>
+          <div class="flex items-baseline justify-between mt-2">
+            <span id="stat-instant-pct" class="text-3xl font-extrabold text-amber-600">0%</span>
+            <span id="stat-instant-count" class="text-xs font-semibold text-slate-600">0 phiếu</span>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Chép nguyên văn / dùng luôn không kiểm tra</p>
+          <div class="flex items-baseline justify-between mt-2">
+            <span id="stat-copy-pct" class="text-3xl font-extrabold text-rose-600">0%</span>
+            <span id="stat-copy-count" class="text-xs font-semibold text-slate-600">0 phiếu</span>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Thấy lười suy nghĩ hơn (Rất nhiều / Một chút)</p>
+          <div class="flex items-baseline justify-between mt-2">
+            <span id="stat-lazy-pct" class="text-3xl font-extrabold text-orange-600">0%</span>
+            <span id="stat-lazy-count" class="text-xs font-semibold text-slate-600">0 phiếu</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 BIỂU ĐỒ QUẠT (MỖI CÂU HỎI 1 BIỂU ĐỒ) -->
+      <div id="pie-charts-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+
+      <!-- Bảng Thông Số Chi Tiết Từng Câu Hỏi -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
         <div>
-          <h2 class="text-lg font-bold text-slate-900">Tổng hợp dữ liệu khảo sát</h2>
-          <p id="data-source-caption" class="text-xs text-slate-500 mt-0.5">Đang tải dữ liệu...</p>
-        </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <button onclick="loadDashboardData()" class="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-xl transition">
-            ↻ Làm mới dữ liệu
-          </button>
-          <button onclick="exportCSV()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition">
-            Xuất CSV
-          </button>
-          <button onclick="exportJSON()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl transition">
-            Xuất JSON
-          </button>
-        </div>
-      </div>
-
-      <!-- KPI Cards -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-          <p class="text-xs font-medium text-slate-500">Tổng phiếu thu về</p>
-          <p id="kpi-total" class="text-2xl font-extrabold text-slate-900 mt-1">0</p>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-          <p class="text-xs font-medium text-slate-500">Dùng AI thường xuyên</p>
-          <p id="kpi-frequent" class="text-2xl font-extrabold text-blue-600 mt-1">0%</p>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-          <p class="text-xs font-medium text-slate-500">Bật ngay AI khi gặp bài khó</p>
-          <p id="kpi-instant-ai" class="text-2xl font-extrabold text-amber-600 mt-1">0%</p>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-          <p class="text-xs font-medium text-slate-500">Cho rằng "Tùy cách dùng"</p>
-          <p id="kpi-depends" class="text-2xl font-extrabold text-emerald-600 mt-1">0%</p>
-        </div>
-      </div>
-
-      <!-- Charts Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <h3 class="text-sm font-bold text-slate-800 mb-3">Câu 1: Mức độ biết và sử dụng AI</h3>
-          <div class="h-60"><canvas id="chart-q1"></canvas></div>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <h3 class="text-sm font-bold text-slate-800 mb-3">Câu 2: Thời gian sử dụng AI mỗi ngày</h3>
-          <div class="h-60"><canvas id="chart-q2"></canvas></div>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <h3 class="text-sm font-bold text-slate-800 mb-3">Câu 3: Phản ứng đầu tiên khi gặp bài khó</h3>
-          <div class="h-60"><canvas id="chart-q3"></canvas></div>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <h3 class="text-sm font-bold text-slate-800 mb-3">Câu 4: Cách xử lý kết quả từ AI</h3>
-          <div class="h-60"><canvas id="chart-q4"></canvas></div>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <h3 class="text-sm font-bold text-slate-800 mb-3">Câu 5: Tác động đến thói quen suy nghĩ</h3>
-          <div class="h-60"><canvas id="chart-q5"></canvas></div>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <h3 class="text-sm font-bold text-slate-800 mb-3">Câu 6: AI có làm giảm khả năng sáng tạo?</h3>
-          <div class="h-60"><canvas id="chart-q6"></canvas></div>
-        </div>
-      </div>
-
-      <!-- Recent Responses Table -->
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-        <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-          <h3 class="text-sm font-bold text-slate-800">Danh sách phản hồi gần nhất</h3>
-          <span class="text-xs text-slate-500">Hiển thị tối đa 15 bản ghi mới nhất</span>
+          <h3 class="text-base font-bold text-slate-900">Bảng Thông Số Chi Tiết Theo Từng Câu Hỏi</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Tổng hợp số lượng lựa chọn và tỷ lệ phần trăm của tất cả phương án</p>
         </div>
         <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse text-xs">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm">
             <thead>
               <tr class="bg-slate-50 text-slate-600 border-b border-slate-200">
-                <th class="py-3 px-4 font-semibold">#</th>
-                <th class="py-3 px-4 font-semibold">Mức độ dùng</th>
-                <th class="py-3 px-4 font-semibold">Thời gian/ngày</th>
-                <th class="py-3 px-4 font-semibold">Phản ứng bài khó</th>
-                <th class="py-3 px-4 font-semibold">Xử lý kết quả</th>
-                <th class="py-3 px-4 font-semibold">Tác động tư duy</th>
-                <th class="py-3 px-4 font-semibold">Sáng tạo</th>
-                <th class="py-3 px-4 font-semibold">Thời gian gửi</th>
+                <th class="py-3 px-4 font-semibold">Câu hỏi</th>
+                <th class="py-3 px-4 font-semibold">Phương án</th>
+                <th class="py-3 px-4 font-semibold text-right">Số câu trả lời</th>
+                <th class="py-3 px-4 font-semibold text-right">Tỷ lệ (%)</th>
               </tr>
             </thead>
-            <tbody id="responses-tbody" class="divide-y divide-slate-100"></tbody>
+            <tbody id="summary-stats-tbody" class="divide-y divide-slate-100"></tbody>
           </table>
         </div>
       </div>
-    </div>
 
-    <!-- API Activity Console -->
-    <section class="bg-slate-900 text-slate-200 rounded-2xl p-4 shadow-sm">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">API Request Log</span>
-        <button onclick="document.getElementById('api-log').innerHTML = ''" class="text-[11px] text-slate-400 hover:text-white">Xóa log</button>
+      <!-- Nút quay lại làm khảo sát -->
+      <div class="text-center pt-2">
+        <button onclick="switchTab('survey')" class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-sm transition">
+          + Trả lời thêm phiếu khảo sát
+        </button>
       </div>
-      <div id="api-log" class="font-mono text-xs space-y-1 max-h-32 overflow-y-auto text-emerald-400">
-        <div>[READY] Hệ thống khảo sát sẵn sàng.</div>
-      </div>
-    </section>
+    </div>
 
   </main>
 
@@ -421,125 +403,136 @@
   </div>
 
   <script>
-    const DEFAULT_MOCKAPI_URL = 'https://6ad6540af71f154ac486c711.mockapi.io/responses';
-    const ENDPOINT_STORAGE_KEY = 'ai_survey_mockapi_url';
+    const MOCKAPI_URL = 'https://6ad6540af71f154ac486c711.mockapi.io/responses';
+
+    Chart.register(ChartDataLabels);
+
+    const QUESTIONS_CONFIG = [
+      {
+        key: 'q1',
+        shortName: 'Câu 1',
+        group: 'Nhóm 1 • Thực trạng tiếp xúc',
+        title: 'Câu 1: Mức độ biết và sử dụng các công cụ AI',
+        options: [
+          { label: 'Thường xuyên', match: 'Thường xuyên', color: '#2563eb' },
+          { label: 'Thỉnh thoảng', match: 'Thỉnh thoảng', color: '#38bdf8' },
+          { label: 'Biết nhưng chưa dùng', match: 'Biết nhưng chưa dùng', color: '#f59e0b' },
+          { label: 'Chưa từng nghe tới', match: 'Chưa từng nghe tới', color: '#94a3b8' }
+        ]
+      },
+      {
+        key: 'q2',
+        shortName: 'Câu 2',
+        group: 'Nhóm 1 • Thực trạng tiếp xúc',
+        title: 'Câu 2: Thời gian trung bình sử dụng AI trong 1 ngày',
+        options: [
+          { label: 'Dưới 30 phút', match: 'Dưới 30 phút', color: '#10b981' },
+          { label: '30 phút - 1 tiếng', match: '30 phút - 1 tiếng', color: '#3b82f6' },
+          { label: 'Nhiều hơn 1 tiếng', match: 'Nhiều hơn 1 tiếng', color: '#8b5cf6' }
+        ]
+      },
+      {
+        key: 'q3',
+        shortName: 'Câu 3',
+        group: 'Nhóm 2 • Tư duy tự lập & Giải quyết vấn đề',
+        title: 'Câu 3: Phản ứng đầu tiên khi gặp bài tập khó',
+        options: [
+          { label: 'A. Tự suy nghĩ & tìm cách giải', matchPrefix: 'A.', color: '#10b981' },
+          { label: 'B. Hỏi bạn bè, thầy cô / tra sách', matchPrefix: 'B.', color: '#f59e0b' },
+          { label: 'C. Bật ngay AI lấy đáp án/gợi ý', matchPrefix: 'C.', color: '#ef4444' }
+        ]
+      },
+      {
+        key: 'q4',
+        shortName: 'Câu 4',
+        group: 'Nhóm 2 • Tư duy tự lập & Giải quyết vấn đề',
+        title: 'Câu 4: Cách xử lý kết quả nhận được từ AI',
+        options: [
+          { label: 'A. Chép nguyên văn / dùng luôn', matchPrefix: 'A.', color: '#ef4444' },
+          { label: 'B. Đọc hiểu, chọn lọc & viết lại', matchPrefix: 'B.', color: '#2563eb' },
+          { label: 'C. Chỉ dùng để đối chiếu bài tự làm', matchPrefix: 'C.', color: '#10b981' }
+        ]
+      },
+      {
+        key: 'q5',
+        shortName: 'Câu 5',
+        group: 'Nhóm 2 • Tư duy tự lập & Giải quyết vấn đề',
+        title: 'Câu 5: Cảm giác "lười suy nghĩ / ngại bài khó" từ khi dùng AI',
+        options: [
+          { label: 'Có, rất nhiều', match: 'Có, rất nhiều', color: '#ef4444' },
+          { label: 'Có một chút', match: 'Có một chút', color: '#f59e0b' },
+          { label: 'Không đổi', match: 'Không đổi', color: '#64748b' },
+          { label: 'Ngược lại, thích tìm tòi hơn', match: 'Ngược lại, thích tìm tòi hơn', color: '#10b981' }
+        ]
+      },
+      {
+        key: 'q6',
+        shortName: 'Câu 6',
+        group: 'Nhóm 3 • Nhận thức của học sinh',
+        title: 'Câu 6: AI có làm giảm khả năng sáng tạo của học sinh?',
+        options: [
+          { label: 'Có', match: 'Có', color: '#ef4444' },
+          { label: 'Không', match: 'Không', color: '#3b82f6' },
+          { label: 'Tùy cách dùng', match: 'Tùy cách dùng', color: '#10b981' }
+        ]
+      }
+    ];
 
     let cachedResponses = [];
-    let chartInstances = {};
-
-    function logApi(message, isError = false) {
-      const logBox = document.getElementById('api-log');
-      const time = new Date().toLocaleTimeString('vi-VN');
-      const line = document.createElement('div');
-      line.className = isError ? 'text-rose-400' : 'text-emerald-400';
-      line.textContent = `[${time}] ${message}`;
-      logBox.prepend(line);
-    }
+    let pieCharts = {};
+    let autoSyncEnabled = true;
+    let autoSyncTimer = null;
 
     function showToast(msg) {
       const toast = document.getElementById('toast');
       document.getElementById('toast-msg').textContent = msg;
       toast.classList.remove('hidden');
-      setTimeout(() => toast.classList.add('hidden'), 3200);
+      setTimeout(() => toast.classList.add('hidden'), 3000);
     }
 
-    function getApiUrl() {
-      const saved = localStorage.getItem(ENDPOINT_STORAGE_KEY);
-      return (saved !== null ? saved : DEFAULT_MOCKAPI_URL).trim();
+    function initPieChartCards() {
+      const grid = document.getElementById('pie-charts-grid');
+      grid.innerHTML = QUESTIONS_CONFIG.map(q => `
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-4">
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md">${q.group}</span>
+            <h3 class="text-base font-bold text-slate-900 mt-2">${q.title}</h3>
+          </div>
+
+          <div class="relative h-64 w-full flex items-center justify-center">
+            <canvas id="pie-${q.key}"></canvas>
+          </div>
+
+          <div id="legend-${q.key}" class="space-y-2 pt-2 border-t border-slate-100 text-xs"></div>
+        </div>
+      `).join('');
     }
 
-    function formatDateValue(rawDate) {
-      if (!rawDate) return '-';
-      const parsed = new Date(rawDate);
-      if (Number.isNaN(parsed.getTime())) return String(rawDate);
-      return parsed.toLocaleString('vi-VN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    }
-
-    function updateApiStatusUI() {
-      const url = getApiUrl();
-      const input = document.getElementById('mockapi-url-input');
-      const badge = document.getElementById('api-mode-badge');
-      const dot = document.getElementById('api-status-dot');
-      input.value = url;
-
-      if (url) {
-        badge.textContent = 'Đã kết nối MockAPI.io';
-        badge.className = 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
-        dot.className = 'mt-1.5 w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0';
-      } else {
-        badge.textContent = 'Chưa có Endpoint';
-        badge.className = 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800';
-        dot.className = 'mt-1.5 w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0';
-      }
-    }
-
-    async function saveApiEndpoint() {
-      const rawUrl = document.getElementById('mockapi-url-input').value.trim().replace(/\/+$/, '');
-      if (rawUrl && !rawUrl.startsWith('http')) {
-        showToast('URL không hợp lệ. Cần bắt đầu bằng https://');
-        return;
-      }
-      localStorage.setItem(ENDPOINT_STORAGE_KEY, rawUrl);
-      updateApiStatusUI();
-      logApi(rawUrl ? `Đã cập nhật Endpoint: ${rawUrl}` : 'Đã xóa Endpoint.');
-      showToast(rawUrl ? 'Đã lưu link MockAPI!' : 'Đã xóa link MockAPI.');
-      await fetchResponses();
-    }
-
-    // API Layer: GET
     async function fetchResponses() {
-      const apiUrl = getApiUrl();
-      if (!apiUrl) {
-        cachedResponses = [];
-        document.getElementById('badge-count').textContent = '0';
-        return cachedResponses;
-      }
-
       try {
-        logApi(`GET ${apiUrl}`);
-        const res = await fetch(apiUrl);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const res = await fetch(MOCKAPI_URL);
+        if (!res.ok) throw new Error('Fetch failed');
         const data = await res.json();
         cachedResponses = Array.isArray(data) ? data : [];
-        logApi(`200 OK — Đã tải ${cachedResponses.length} phiếu từ MockAPI.`);
-      } catch (err) {
-        logApi(`LỖI GET MockAPI (${err.message}). Kiểm tra tên :endpoint trên MockAPI.io!`, true);
-        showToast('Không tải được dữ liệu từ MockAPI. Kiểm tra tên endpoint.');
-        cachedResponses = [];
+        document.getElementById('badge-count').textContent = cachedResponses.length;
+        return cachedResponses;
+      } catch (_) {
+        return cachedResponses;
       }
-
-      document.getElementById('badge-count').textContent = cachedResponses.length;
-      return cachedResponses;
     }
 
-    // API Layer: POST (createdAt là kiểu Date ISO chuẩn)
     async function createResponse(payload) {
-      const apiUrl = getApiUrl();
-      if (!apiUrl) {
-        throw new Error('Chưa cấu hình MockAPI Endpoint');
-      }
-
       const record = {
         ...payload,
         createdAt: new Date().toISOString()
       };
-
-      logApi(`POST ${apiUrl} (createdAt: ${record.createdAt})`);
-      const res = await fetch(apiUrl, {
+      const res = await fetch(MOCKAPI_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(record)
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const created = await res.json();
-      logApi(`201 Created — Đã lưu lên MockAPI (ID: ${created.id || 'N/A'}).`);
-      return created;
+      if (!res.ok) throw new Error('Submit failed');
+      return await res.json();
     }
 
     function updateProgress() {
@@ -585,23 +578,21 @@
 
       if (firstInvalidBlock) {
         firstInvalidBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        showToast('Vui lòng hoàn thành tất cả 6 câu hỏi!');
+        showToast('Vui lòng chọn đầy đủ cả 6 câu hỏi!');
         return;
       }
 
       const btn = document.getElementById('submit-btn');
       btn.disabled = true;
-      btn.innerHTML = '<span>Đang gửi dữ liệu...</span>';
+      btn.innerHTML = '<span>Đang gửi...</span>';
 
       try {
         await createResponse(payload);
-        await fetchResponses();
         resetForm();
-        showToast('Gửi phiếu khảo sát thành công!');
-        switchTab('dashboard');
-      } catch (err) {
-        logApi(`LỖI POST MockAPI: ${err.message}`, true);
-        showToast('Gửi thất bại! Kiểm tra lại endpoint trên MockAPI.');
+        showToast('Đã gửi khảo sát! Biểu đồ & thông số đã được cập nhật.');
+        await switchTab('public');
+      } catch (_) {
+        showToast('Gửi chưa thành công, vui lòng thử lại!');
       } finally {
         btn.disabled = false;
         btn.innerHTML = '<span>Gửi Kết Quả Khảo Sát</span>';
@@ -610,126 +601,170 @@
 
     async function switchTab(tab) {
       const surveyView = document.getElementById('view-survey');
-      const dashView = document.getElementById('view-dashboard');
+      const publicView = document.getElementById('view-public');
       const tabSurvey = document.getElementById('tab-survey');
-      const tabDash = document.getElementById('tab-dashboard');
+      const tabPublic = document.getElementById('tab-public');
 
       if (tab === 'survey') {
         surveyView.classList.remove('hidden');
-        dashView.classList.add('hidden');
+        publicView.classList.add('hidden');
         tabSurvey.className = 'px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-white text-blue-600 shadow-sm';
-        tabDash.className = 'px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900 flex items-center gap-1.5';
+        tabPublic.className = 'px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900 flex items-center gap-2';
       } else {
         surveyView.classList.add('hidden');
-        dashView.classList.remove('hidden');
-        tabDash.className = 'px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-white text-blue-600 shadow-sm flex items-center gap-1.5';
+        publicView.classList.remove('hidden');
+        tabPublic.className = 'px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-white text-blue-600 shadow-sm flex items-center gap-2';
         tabSurvey.className = 'px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900';
-        await loadDashboardData();
+        await refreshPublicResults(false);
       }
     }
 
-    async function loadDashboardData() {
+    function setStatCard(pctId, countId, count, total) {
+      const pct = total ? `${((count / total) * 100).toFixed(1)}%` : '0%';
+      document.getElementById(pctId).textContent = pct;
+      document.getElementById(countId).textContent = `${count} phiếu`;
+    }
+
+    async function refreshPublicResults(showNotify = false) {
       const data = await fetchResponses();
       const total = data.length;
-      const apiUrl = getApiUrl();
 
-      document.getElementById('data-source-caption').textContent = apiUrl
-        ? `Endpoint: ${apiUrl} (${total} bản ghi)`
-        : 'Chưa cấu hình endpoint MockAPI';
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('last-updated-text').textContent = `Cập nhật lúc ${new Date().toLocaleTimeString('vi-VN')}`;
 
-      document.getElementById('kpi-total').textContent = total;
-      const pct = (count) => total ? `${Math.round((count / total) * 100)}%` : '0%';
+      const usingCount = data.filter(d => d.q1 === 'Thường xuyên' || d.q1 === 'Thỉnh thoảng').length;
+      const over30Count = data.filter(d => d.q2 === '30 phút - 1 tiếng' || d.q2 === 'Nhiều hơn 1 tiếng').length;
+      const instantCount = data.filter(d => d.q3 && String(d.q3).startsWith('C.')).length;
+      const copyCount = data.filter(d => d.q4 && String(d.q4).startsWith('A.')).length;
+      const lazyCount = data.filter(d => d.q5 === 'Có, rất nhiều' || d.q5 === 'Có một chút').length;
 
-      document.getElementById('kpi-frequent').textContent = pct(data.filter(d => d.q1 === 'Thường xuyên').length);
-      document.getElementById('kpi-instant-ai').textContent = pct(data.filter(d => d.q3 && d.q3.startsWith('C.')).length);
-      document.getElementById('kpi-depends').textContent = pct(data.filter(d => d.q6 === 'Tùy cách dùng').length);
+      setStatCard('stat-using-pct', 'stat-using-count', usingCount, total);
+      setStatCard('stat-over30-pct', 'stat-over30-count', over30Count, total);
+      setStatCard('stat-instant-pct', 'stat-instant-count', instantCount, total);
+      setStatCard('stat-copy-pct', 'stat-copy-count', copyCount, total);
+      setStatCard('stat-lazy-pct', 'stat-lazy-count', lazyCount, total);
 
-      renderChart('chart-q1', 'doughnut', ['Thường xuyên', 'Thỉnh thoảng', 'Biết nhưng chưa dùng', 'Chưa từng nghe tới'], data.map(d => d.q1), ['#2563eb', '#60a5fa', '#f59e0b', '#94a3b8']);
-      renderChart('chart-q2', 'bar', ['Dưới 30 phút', '30 phút - 1 tiếng', 'Nhiều hơn 1 tiếng'], data.map(d => d.q2), ['#10b981', '#3b82f6', '#8b5cf6']);
-      renderChart('chart-q3', 'bar', ['A. Tự suy nghĩ', 'B. Hỏi bạn bè/thầy cô', 'C. Bật ngay AI'], data.map(d => {
-        if (!d.q3) return '';
-        if (d.q3.startsWith('A.')) return 'A. Tự suy nghĩ';
-        if (d.q3.startsWith('B.')) return 'B. Hỏi bạn bè/thầy cô';
-        return 'C. Bật ngay AI';
-      }), ['#10b981', '#f59e0b', '#ef4444']);
-      renderChart('chart-q4', 'pie', ['A. Chép nguyên văn', 'B. Đọc hiểu & viết lại', 'C. Chỉ đối chiếu'], data.map(d => {
-        if (!d.q4) return '';
-        if (d.q4.startsWith('A.')) return 'A. Chép nguyên văn';
-        if (d.q4.startsWith('B.')) return 'B. Đọc hiểu & viết lại';
-        return 'C. Chỉ đối chiếu';
-      }), ['#ef4444', '#3b82f6', '#10b981']);
-      renderChart('chart-q5', 'bar', ['Có, rất nhiều', 'Có một chút', 'Không đổi', 'Ngược lại, thích tìm tòi hơn'], data.map(d => d.q5), ['#ef4444', '#f59e0b', '#94a3b8', '#10b981']);
-      renderChart('chart-q6', 'doughnut', ['Có', 'Không', 'Tùy cách dùng'], data.map(d => d.q6), ['#ef4444', '#3b82f6', '#10b981']);
+      const summaryRows = [];
 
-      // Render Table
-      const tbody = document.getElementById('responses-tbody');
-      tbody.innerHTML = '';
-      const recent = [...data].reverse().slice(0, 15);
-      if (recent.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="py-6 text-center text-slate-400">Chưa có dữ liệu khảo sát nào.</td></tr>';
-        return;
-      }
+      QUESTIONS_CONFIG.forEach(q => {
+        const counts = q.options.map(opt => {
+          return data.filter(row => {
+            const val = String(row[q.key] || '');
+            if (opt.matchPrefix) return val.startsWith(opt.matchPrefix);
+            return val === opt.match;
+          }).length;
+        });
 
-      recent.forEach((item, idx) => {
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-50';
-        tr.innerHTML = `
-          <td class="py-3 px-4 font-semibold text-slate-500">${item.id || (total - idx)}</td>
-          <td class="py-3 px-4 font-medium text-slate-800">${item.q1 || '-'}</td>
-          <td class="py-3 px-4 text-slate-600">${item.q2 || '-'}</td>
-          <td class="py-3 px-4 text-slate-600">${item.q3 || '-'}</td>
-          <td class="py-3 px-4 text-slate-600">${item.q4 || '-'}</td>
-          <td class="py-3 px-4 text-slate-600">${item.q5 || '-'}</td>
-          <td class="py-3 px-4 font-medium text-slate-800">${item.q6 || '-'}</td>
-          <td class="py-3 px-4 text-slate-500 whitespace-nowrap">${formatDateValue(item.createdAt)}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
+        const totalForQ = counts.reduce((a, b) => a + b, 0);
+        const labels = q.options.map(o => o.label);
+        const colors = q.options.map(o => o.color);
 
-    function renderChart(canvasId, type, labels, values, colors) {
-      if (chartInstances[canvasId]) {
-        chartInstances[canvasId].destroy();
-      }
-      const counts = labels.map(label => values.filter(v => v === label).length);
-      const ctx = document.getElementById(canvasId).getContext('2d');
-      chartInstances[canvasId] = new Chart(ctx, {
-        type,
-        data: {
-          labels,
-          datasets: [{
-            data: counts,
-            backgroundColor: colors,
-            borderRadius: type === 'bar' ? 6 : 0,
-            borderWidth: type === 'bar' ? 0 : 2,
-            borderColor: '#ffffff'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: type !== 'bar',
-              position: 'bottom',
-              labels: { boxWidth: 12, font: { size: 11 } }
+        const canvasId = `pie-${q.key}`;
+        if (pieCharts[canvasId]) {
+          pieCharts[canvasId].data.labels = labels;
+          pieCharts[canvasId].data.datasets[0].data = counts;
+          pieCharts[canvasId].update();
+        } else {
+          const ctx = document.getElementById(canvasId).getContext('2d');
+          pieCharts[canvasId] = new Chart(ctx, {
+            type: 'pie',
+            data: {
+              labels,
+              datasets: [{
+                data: counts,
+                backgroundColor: colors,
+                borderColor: '#ffffff',
+                borderWidth: 2
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  callbacks: {
+                    label: (context) => {
+                      const val = context.raw || 0;
+                      const pct = totalForQ ? ((val / totalForQ) * 100).toFixed(1) : '0.0';
+                      return ` ${context.label}: ${val} phiếu (${pct}%)`;
+                    }
+                  }
+                },
+                datalabels: {
+                  color: '#ffffff',
+                  font: { weight: 'bold', size: 11 },
+                  textAlign: 'center',
+                  formatter: (value) => {
+                    if (!value || !totalForQ) return '';
+                    const pct = ((value / totalForQ) * 100).toFixed(1);
+                    return `${value} phiếu\n(${pct}%)`;
+                  }
+                }
+              }
             }
-          },
-          scales: type === 'bar' ? {
-            y: { beginAtZero: true, ticks: { precision: 0 } },
-            x: { ticks: { font: { size: 11 } } }
-          } : {}
+          });
         }
+
+        const legendBox = document.getElementById(`legend-${q.key}`);
+        legendBox.innerHTML = q.options.map((opt, i) => {
+          const count = counts[i];
+          const pct = totalForQ ? ((count / totalForQ) * 100).toFixed(1) : '0.0';
+          summaryRows.push(`
+            <tr class="hover:bg-slate-50">
+              <td class="py-2.5 px-4 font-semibold text-slate-700">${q.shortName}</td>
+              <td class="py-2.5 px-4 text-slate-700">${opt.label}</td>
+              <td class="py-2.5 px-4 text-right font-semibold text-slate-900">${count}</td>
+              <td class="py-2.5 px-4 text-right font-bold text-blue-600">${pct}%</td>
+            </tr>
+          `);
+          return `
+            <div class="flex items-center justify-between gap-2 py-1 px-2 rounded-lg hover:bg-slate-50">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="w-3 h-3 rounded-sm shrink-0" style="background-color: ${opt.color}"></span>
+                <span class="text-slate-700 font-medium truncate">${opt.label}</span>
+              </div>
+              <div class="shrink-0 font-semibold text-slate-800">
+                <span>${count} phiếu</span>
+                <span class="text-blue-600 ml-1">(${pct}%)</span>
+              </div>
+            </div>
+          `;
+        }).join('');
       });
+
+      document.getElementById('summary-stats-tbody').innerHTML = summaryRows.join('');
+
+      if (showNotify) {
+        showToast('Đã cập nhật số liệu mới nhất!');
+      }
     }
 
-    function exportJSON() {
-      const blob = new Blob([JSON.stringify(cachedResponses, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'khao-sat-ai.json';
-      a.click();
+    function toggleAutoSync() {
+      autoSyncEnabled = !autoSyncEnabled;
+      const btn = document.getElementById('live-sync-btn');
+      if (autoSyncEnabled) {
+        btn.textContent = '● Tự động cập nhật: BẬT';
+        btn.className = 'px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold rounded-xl transition';
+        startAutoSync();
+      } else {
+        btn.textContent = '○ Tự động cập nhật: TẮT';
+        btn.className = 'px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 text-xs font-semibold rounded-xl transition';
+        if (autoSyncTimer) clearInterval(autoSyncTimer);
+      }
+    }
+
+    function startAutoSync() {
+      if (autoSyncTimer) clearInterval(autoSyncTimer);
+      autoSyncTimer = setInterval(async () => {
+        if (!autoSyncEnabled) return;
+        const isPublicVisible = !document.getElementById('view-public').classList.contains('hidden');
+        if (isPublicVisible) {
+          await refreshPublicResults(false);
+        } else {
+          await fetchResponses();
+        }
+      }, 10000);
     }
 
     function exportCSV() {
@@ -742,14 +777,14 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'khao-sat-ai.csv';
+      a.download = 'ket-qua-khao-sat-ai.csv';
       a.click();
     }
 
-    // Init
     window.addEventListener('DOMContentLoaded', async () => {
-      updateApiStatusUI();
+      initPieChartCards();
       await fetchResponses();
+      startAutoSync();
     });
   </script>
 </body>
