@@ -283,7 +283,7 @@
 
     <!-- TAB 2: KẾT QUẢ & THÔNG SỐ -->
     <div id="view-public" class="hidden space-y-6 animate-fade-in">
-      <!-- Tiêu đề & Nút thao tác -->
+      <!-- Tiêu đề & Khu vực điều khiển được bảo vệ bằng mật khẩu -->
       <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div class="space-y-1">
           <div class="flex items-center gap-2.5 flex-wrap">
@@ -300,14 +300,17 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2 shrink-0">
-          <button id="live-sync-btn" onclick="toggleAutoSync()" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold rounded-xl transition">
-            ● Tự động cập nhật: BẬT
+          <button id="live-sync-btn" onclick="handleProtectedAction(toggleAutoSync)" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold rounded-xl transition">
+            🔒 Tự động cập nhật: BẬT
           </button>
-          <button onclick="refreshPublicResults(true)" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition">
-            ↻ Làm mới
+          <button onclick="handleProtectedAction(() => refreshPublicResults(true))" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition">
+            🔒 Làm mới
           </button>
-          <button onclick="exportCSV()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl transition">
-            Tải bảng CSV
+          <button onclick="handleProtectedAction(exportCSV)" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl transition">
+            🔒 Tải bảng CSV
+          </button>
+          <button id="lock-btn" onclick="lockAdminControls()" class="hidden px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold rounded-xl transition">
+            Khóa lại
           </button>
         </div>
       </div>
@@ -397,6 +400,35 @@
 
   </main>
 
+  <!-- Modal Nhập Mật Khẩu -->
+  <div id="passcode-modal" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-2xl max-w-sm w-full p-6 shadow-xl space-y-4 animate-fade-in">
+      <div>
+        <h3 class="text-base font-bold text-slate-900">Xác thực mật khẩu</h3>
+        <p class="text-xs text-slate-500 mt-1">Nhập mật khẩu riêng để thay đổi cài đặt tự động cập nhật hoặc xuất dữ liệu.</p>
+      </div>
+      <form id="passcode-form" onsubmit="submitPasscode(event)" class="space-y-3">
+        <input
+          id="passcode-input"
+          type="password"
+          placeholder="Nhập mật khẩu..."
+          autocomplete="off"
+          class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        />
+        <p id="passcode-error" class="hidden text-xs text-red-600 font-medium">Mật khẩu chưa đúng, thử lại nhé!</p>
+        <div class="flex items-center justify-end gap-2 pt-1">
+          <button type="button" onclick="closePasscodeModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50">
+            Hủy
+          </button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-xs font-semibold text-white">
+            Xác nhận
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg text-sm font-medium flex items-center gap-2">
     <span id="toast-msg"></span>
@@ -404,6 +436,7 @@
 
   <script>
     const MOCKAPI_URL = 'https://6ad6540af71f154ac486c711.mockapi.io/responses';
+    const SECRET_PASSCODE = 'GemVaToi2026';
 
     Chart.register(ChartDataLabels);
 
@@ -482,12 +515,67 @@
     let pieCharts = {};
     let autoSyncEnabled = true;
     let autoSyncTimer = null;
+    let isUnlocked = false;
+    let pendingAction = null;
 
     function showToast(msg) {
       const toast = document.getElementById('toast');
       document.getElementById('toast-msg').textContent = msg;
       toast.classList.remove('hidden');
       setTimeout(() => toast.classList.add('hidden'), 3000);
+    }
+
+    function updateLockUI() {
+      const prefix = isUnlocked ? '' : '🔒 ';
+      const btn = document.getElementById('live-sync-btn');
+      if (autoSyncEnabled) {
+        btn.textContent = `${prefix}● Tự động cập nhật: BẬT`;
+        btn.className = 'px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold rounded-xl transition';
+      } else {
+        btn.textContent = `${prefix}○ Tự động cập nhật: TẮT`;
+        btn.className = 'px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 text-xs font-semibold rounded-xl transition';
+      }
+      document.getElementById('lock-btn').classList.toggle('hidden', !isUnlocked);
+    }
+
+    function handleProtectedAction(actionFn) {
+      if (isUnlocked) {
+        actionFn();
+        return;
+      }
+      pendingAction = actionFn;
+      document.getElementById('passcode-input').value = '';
+      document.getElementById('passcode-error').classList.add('hidden');
+      document.getElementById('passcode-modal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('passcode-input').focus(), 50);
+    }
+
+    function closePasscodeModal() {
+      pendingAction = null;
+      document.getElementById('passcode-modal').classList.add('hidden');
+    }
+
+    function submitPasscode(e) {
+      e.preventDefault();
+      const inputVal = document.getElementById('passcode-input').value;
+      if (inputVal === SECRET_PASSCODE) {
+        isUnlocked = true;
+        updateLockUI();
+        const actionToRun = pendingAction;
+        closePasscodeModal();
+        showToast('Đã mở khóa điều khiển!');
+        if (typeof actionToRun === 'function') {
+          actionToRun();
+        }
+      } else {
+        document.getElementById('passcode-error').classList.remove('hidden');
+      }
+    }
+
+    function lockAdminControls() {
+      isUnlocked = false;
+      updateLockUI();
+      showToast('Đã khóa lại cụm điều khiển.');
     }
 
     function initPieChartCards() {
@@ -742,15 +830,13 @@
 
     function toggleAutoSync() {
       autoSyncEnabled = !autoSyncEnabled;
-      const btn = document.getElementById('live-sync-btn');
+      updateLockUI();
       if (autoSyncEnabled) {
-        btn.textContent = '● Tự động cập nhật: BẬT';
-        btn.className = 'px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold rounded-xl transition';
         startAutoSync();
+        showToast('Đã bật tự động cập nhật.');
       } else {
-        btn.textContent = '○ Tự động cập nhật: TẮT';
-        btn.className = 'px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 text-xs font-semibold rounded-xl transition';
         if (autoSyncTimer) clearInterval(autoSyncTimer);
+        showToast('Đã tắt tự động cập nhật.');
       }
     }
 
@@ -783,6 +869,7 @@
 
     window.addEventListener('DOMContentLoaded', async () => {
       initPieChartCards();
+      updateLockUI();
       await fetchResponses();
       startAutoSync();
     });
